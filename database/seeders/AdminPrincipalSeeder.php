@@ -6,7 +6,6 @@ use App\Models\Niveau;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
 
 class AdminPrincipalSeeder extends Seeder
 {
@@ -25,7 +24,7 @@ class AdminPrincipalSeeder extends Seeder
             ]
         );
 
-        $admin->syncPermissions(Permission::all());
+        $admin->syncRoles(['Administrateur']);
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }

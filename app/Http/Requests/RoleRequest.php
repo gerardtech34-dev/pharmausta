@@ -20,6 +20,12 @@ class RoleRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('roles', 'name')->ignore($this->route('role')),
+                function ($attribute, $value, $fail) {
+                    $interdits = ['administrateur', 'administrateur principal'];
+                    if (in_array(mb_strtolower($value), $interdits)) {
+                        $fail('Ce nom de rôle est réservé.');
+                    }
+                },
             ],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['exists:permissions,name'],

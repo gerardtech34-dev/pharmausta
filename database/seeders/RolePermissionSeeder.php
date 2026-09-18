@@ -23,10 +23,15 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
+        $roleAdmin = Role::firstOrCreate(['name' => 'Administrateur']);
+        $roleAdmin->syncPermissions(Permission::all());
+
         $roleModerateur = Role::firstOrCreate(['name' => 'Modérateur ressources']);
         $roleModerateur->syncPermissions(['gerer-ressources']);
 
         $roleGestionnaire = Role::firstOrCreate(['name' => 'Gestionnaire pédagogique']);
         $roleGestionnaire->syncPermissions(['gerer-ressources', 'gerer-referentiels']);
+
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }

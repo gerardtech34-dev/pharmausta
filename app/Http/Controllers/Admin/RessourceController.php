@@ -32,17 +32,51 @@ class RessourceController extends Controller implements HasMiddleware
             $query->where('statut', $request->statut);
         }
 
-        $ressources = $query->paginate(15);
-        return view('admin.ressources.index', compact('ressources'));
+        if ($request->filled('annee_academique_id')) {
+            $query->where('annee_academique_id', $request->annee_academique_id);
+        }
+
+        if ($request->filled('niveau_id')) {
+            $query->where('niveau_id', $request->niveau_id);
+        }
+
+        if ($request->filled('ue_id')) {
+            $query->where('ue_id', $request->ue_id);
+        }
+
+        if ($request->filled('ecue_id')) {
+            $query->where('ecue_id', $request->ecue_id);
+        }
+
+        if ($request->filled('type_ressource_id')) {
+            $query->where('type_ressource_id', $request->type_ressource_id);
+        }
+
+        $ressources = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+
+        $anneesAcademiques = AnneeAcademique::orderBy('libelle')->get();
+        $niveaux = Niveau::orderBy('nom')->get();
+        $ues = Ue::orderBy('nom')->get();
+        $ecues = Ecue::orderBy('nom')->get();
+        $typesRessources = TypeRessource::orderBy('nom')->get();
+
+        return view('admin.ressources.index', compact(
+            'ressources',
+            'anneesAcademiques',
+            'niveaux',
+            'ues',
+            'ecues',
+            'typesRessources'
+        ));
     }
 
     public function create()
     {
-        $anneesAcademiques = AnneeAcademique::all();
-        $niveaux = Niveau::all();
-        $ues = Ue::all();
-        $ecues = Ecue::all();
-        $typesRessources = TypeRessource::all();
+        $anneesAcademiques = AnneeAcademique::orderBy('libelle')->get();
+        $niveaux = Niveau::orderBy('nom')->get();
+        $ues = Ue::orderBy('nom')->get();
+        $ecues = Ecue::orderBy('nom')->get();
+        $typesRessources = TypeRessource::orderBy('nom')->get();
         return view('admin.ressources.create', compact('anneesAcademiques', 'niveaux', 'ues', 'ecues', 'typesRessources'));
     }
 
@@ -65,11 +99,11 @@ class RessourceController extends Controller implements HasMiddleware
 
     public function edit(Ressource $ressource)
     {
-        $anneesAcademiques = AnneeAcademique::all();
-        $niveaux = Niveau::all();
-        $ues = Ue::all();
-        $ecues = Ecue::all();
-        $typesRessources = TypeRessource::all();
+        $anneesAcademiques = AnneeAcademique::orderBy('libelle')->get();
+        $niveaux = Niveau::orderBy('nom')->get();
+        $ues = Ue::orderBy('nom')->get();
+        $ecues = Ecue::orderBy('nom')->get();
+        $typesRessources = TypeRessource::orderBy('nom')->get();
         return view('admin.ressources.edit', compact('ressource', 'anneesAcademiques', 'niveaux', 'ues', 'ecues', 'typesRessources'));
     }
 

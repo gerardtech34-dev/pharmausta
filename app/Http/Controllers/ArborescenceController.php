@@ -7,8 +7,6 @@ use App\Models\Ecue;
 use App\Models\Niveau;
 use App\Models\Ressource;
 use App\Models\Ue;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 
 class ArborescenceController extends Controller
 {

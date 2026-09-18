@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RoleRequest;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Spatie\Permission\Models\Permission;
@@ -21,8 +20,14 @@ class RoleController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $roles = Role::with('permissions')->get();
+        $roles = Role::withCount(['permissions', 'users'])->get();
         return view('admin.roles.index', compact('roles'));
+    }
+
+    public function show(Role $role)
+    {
+        $role->load('permissions');
+        return view('admin.roles.show', compact('role'));
     }
 
     public function create()
@@ -48,8 +53,9 @@ class RoleController extends Controller implements HasMiddleware
 
     public function update(RoleRequest $request, Role $role)
     {
-        if ($role->name === 'Administrateur principal') {
-            abort(403, 'Ce rôle ne peut pas être modifié.');
+        if ($role->name === 'Administrateur') {
+            session()->flash('error', 'Ce rôle est protégé et ne peut pas être modifié ou supprimé.');
+            return redirect()->route('admin.roles.index');
         }
 
         $role->name = $request->validated()['name'];
@@ -61,8 +67,9 @@ class RoleController extends Controller implements HasMiddleware
 
     public function destroy(Role $role)
     {
-        if ($role->name === 'Administrateur principal') {
-            abort(403, 'Ce rôle ne peut pas être supprimé.');
+        if ($role->name === 'Administrateur') {
+            session()->flash('error', 'Ce rôle est protégé et ne peut pas être modifié ou supprimé.');
+            return redirect()->route('admin.roles.index');
         }
 
         $role->delete();

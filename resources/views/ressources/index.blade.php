@@ -6,7 +6,7 @@
 
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('ressources.index') }}" class="row g-3">
+            <form method="GET" action="{{ route('ressources.index') }}" id="form-recherche" class="row g-3">
                 <div class="col-md-6">
                     <label for="titre" class="form-label">Titre</label>
                     <input type="text" name="titre" id="titre" class="form-control" value="{{ request('titre') }}" placeholder="Rechercher par titre...">
@@ -19,7 +19,7 @@
                     <label for="annee_academique_id" class="form-label">Année académique</label>
                     <select name="annee_academique_id" id="annee_academique_id" class="form-select">
                         <option value="">Toutes</option>
-                        @foreach(\App\Models\AnneeAcademique::all() as $annee)
+                        @foreach($anneesAcademiques as $annee)
                             <option value="{{ $annee->id }}" {{ request('annee_academique_id') == $annee->id ? 'selected' : '' }}>{{ $annee->libelle }}</option>
                         @endforeach
                     </select>
@@ -28,7 +28,7 @@
                     <label for="niveau_id" class="form-label">Niveau</label>
                     <select name="niveau_id" id="niveau_id" class="form-select">
                         <option value="">Tous</option>
-                        @foreach(\App\Models\Niveau::all() as $niveau)
+                        @foreach($niveaux as $niveau)
                             <option value="{{ $niveau->id }}" {{ request('niveau_id') == $niveau->id ? 'selected' : '' }}>{{ $niveau->nom }}</option>
                         @endforeach
                     </select>
@@ -37,7 +37,7 @@
                     <label for="ue_id" class="form-label">UE</label>
                     <select name="ue_id" id="ue_id" class="form-select">
                         <option value="">Toutes</option>
-                        @foreach(\App\Models\Ue::all() as $ue)
+                        @foreach($ues as $ue)
                             <option value="{{ $ue->id }}" {{ request('ue_id') == $ue->id ? 'selected' : '' }}>{{ $ue->nom }}</option>
                         @endforeach
                     </select>
@@ -47,12 +47,9 @@
                     <select name="ecue_id" id="ecue_id" class="form-select" disabled>
                         <option value="">Sélectionnez d'abord une UE</option>
                         @if(request('ue_id') && request('ecue_id'))
-                            @php $ueSelectionnee = \App\Models\Ue::find(request('ue_id')); @endphp
-                            @if($ueSelectionnee)
-                                @foreach($ueSelectionnee->ecues()->orderBy('nom')->get() as $ecue)
-                                    <option value="{{ $ecue->id }}" {{ request('ecue_id') == $ecue->id ? 'selected' : '' }}>{{ $ecue->nom }}</option>
-                                @endforeach
-                            @endif
+                            @foreach($ecues->where('ue_id', request('ue_id')) as $ecue)
+                                <option value="{{ $ecue->id }}" {{ request('ecue_id') == $ecue->id ? 'selected' : '' }}>{{ $ecue->nom }}</option>
+                            @endforeach
                         @endif
                     </select>
                 </div>
@@ -60,7 +57,7 @@
                     <label for="type_ressource_id" class="form-label">Type de ressource</label>
                     <select name="type_ressource_id" id="type_ressource_id" class="form-select">
                         <option value="">Tous</option>
-                        @foreach(\App\Models\TypeRessource::all() as $type)
+                        @foreach($typesRessources as $type)
                             <option value="{{ $type->id }}" {{ request('type_ressource_id') == $type->id ? 'selected' : '' }}>{{ $type->nom }}</option>
                         @endforeach
                     </select>
@@ -72,57 +69,54 @@
         </div>
     </div>
 
-    <div class="row g-4">
-        @forelse($ressources as $ressource)
-            <div class="col-md-6 col-lg-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-primary">{{ $ressource->typeRessource->nom ?? 'Type inconnu' }}</span>
-                            <small class="text-muted">{{ $ressource->anneeAcademique->libelle ?? '' }}</small>
-                        </div>
-                        <h5 class="card-title fw-bold">{{ $ressource->titre }}</h5>
-                        <p class="card-text text-muted flex-grow-1">{{ Str::limit($ressource->description, 120) }}</p>
-                        <div class="mt-3 d-flex justify-content-between align-items-center">
-                            <div class="small text-muted">
-                                {{ $ressource->niveau->nom ?? '' }} · {{ $ressource->ue->nom ?? '' }}
-                                @if($ressource->ecue)
-                                    · {{ $ressource->ecue->nom }}
-                                @endif
-                            </div>
-                            <div class="btn-group">
-                                <a href="{{ route('ressources.show', $ressource) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-eye"></i> Voir
-                                </a>
-                                <a href="{{ route('ressources.download', $ressource) }}" class="btn btn-sm btn-success">
-                                    <i class="bi bi-download"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <div class="alert alert-info">Aucune ressource publiée ne correspond à vos critères.</div>
-            </div>
-        @endforelse
-    </div>
-
-    <div class="d-flex justify-content-center mt-4">
-        {{ $ressources->links() }}
+    <div id="zone-resultats">
+        @include('ressources._resultats')
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('form-recherche');
+    const zoneResultats = document.getElementById('zone-resultats');
     const ueSelect = document.getElementById('ue_id');
     const ecueSelect = document.getElementById('ecue_id');
-    const routeBase = "{{ route('ressources.ecuesParUe', ['ue' => '__ID__']) }}";
 
-    function updateEcueSelect() {
-        const ueId = ueSelect.value;
-        ecueSelect.innerHTML = '';
+    let debounceTimer = null;
+
+    function chargerResultats() {
+        const params = new URLSearchParams(new FormData(form)).toString();
+        const url = form.action + '?' + params;
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            zoneResultats.innerHTML = data.html;
+        })
+        .catch(err => console.error(err));
+    }
+
+    function debounce(callback, delay) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(callback, delay);
+    }
+
+    form.querySelectorAll('input[type="text"]').forEach(el => {
+        el.addEventListener('input', () => debounce(chargerResultats, 400));
+    });
+
+    form.querySelectorAll('select').forEach(el => {
+        el.addEventListener('change', chargerResultats);
+    });
+
+    const ecuesRouteBase = "{{ route('ressources.ecuesParUe', ['ue' => '__ID__']) }}";
+
+    function chargerEcues(ueId, ecueSelectionnee = null) {
+        ecueSelect.innerHTML = '<option value="">Chargement...</option>';
         ecueSelect.disabled = true;
 
         if (!ueId) {
@@ -130,33 +124,31 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        fetch(routeBase.replace('__ID__', ueId))
-            .then(response => response.json())
+        fetch(ecuesRouteBase.replace('__ID__', ueId))
+            .then(r => r.json())
             .then(data => {
                 if (data.length > 0) {
                     ecueSelect.innerHTML = '<option value="">Toutes</option>';
                     data.forEach(ecue => {
-                        const option = document.createElement('option');
-                        option.value = ecue.id;
-                        option.textContent = ecue.nom;
-                        ecueSelect.appendChild(option);
+                        const opt = document.createElement('option');
+                        opt.value = ecue.id;
+                        opt.textContent = ecue.nom;
+                        if (ecueSelectionnee && ecueSelectionnee == ecue.id) opt.selected = true;
+                        ecueSelect.appendChild(opt);
                     });
                     ecueSelect.disabled = false;
                 } else {
                     ecueSelect.innerHTML = '<option value="">Aucune ECUE pour cette UE</option>';
                 }
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement des ECUE:', error);
-                ecueSelect.innerHTML = '<option value="">Erreur de chargement</option>';
             });
     }
 
-    ueSelect.addEventListener('change', updateEcueSelect);
+    ueSelect.addEventListener('change', function() {
+        chargerEcues(this.value);
+    });
 
-    // Si une UE est présélectionnée (recherche déjà filtrée)
     if (ueSelect.value) {
-        updateEcueSelect();
+        chargerEcues(ueSelect.value, "{{ request('ecue_id') }}");
     }
 });
 </script>

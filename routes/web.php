@@ -20,9 +20,12 @@ use App\Http\Controllers\ArborescenceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RessourceRechercheController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/contact', 'contact')->name('contact');
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');

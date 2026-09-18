@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnneeAcademique;
+use App\Models\Ecue;
 use App\Models\Niveau;
 use App\Models\Ressource;
+use App\Models\TypeRessource;
 use App\Models\Ue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -41,8 +44,28 @@ class RessourceRechercheController extends Controller
             });
         }
 
-        $ressources = $query->paginate(12);
-        return view('ressources.index', compact('ressources'));
+        $ressources = $query->paginate(12)->withQueryString();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'html' => view('ressources._resultats', compact('ressources'))->render(),
+            ]);
+        }
+
+        $anneesAcademiques = AnneeAcademique::orderBy('libelle')->get();
+        $niveaux = Niveau::orderBy('nom')->get();
+        $ues = Ue::orderBy('nom')->get();
+        $ecues = Ecue::orderBy('nom')->get();
+        $typesRessources = TypeRessource::orderBy('nom')->get();
+
+        return view('ressources.index', compact(
+            'ressources',
+            'anneesAcademiques',
+            'niveaux',
+            'ues',
+            'ecues',
+            'typesRessources'
+        ));
     }
 
     public function show(Ressource $ressource)
@@ -61,9 +84,7 @@ class RessourceRechercheController extends Controller
     public function download(Ressource $ressource)
     {
         abort_if($ressource->statut !== 'publie', 404);
-
         $ressource->increment('telechargements');
-
         return Storage::disk('local')->download($ressource->fichier);
     }
 

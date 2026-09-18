@@ -40,13 +40,31 @@
                             </li>
                         @else
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('ressources.*') ? 'active' : '' }}" href="{{ route('ressources.index') }}">Ressources</a>
+                                <a class="nav-link {{ request()->routeIs('ressources.*') || request()->routeIs('arborescence.*') ? 'active' : '' }}" href="{{ route('ressources.index') }}">Ressources</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">Mon profil</a>
-                            </li>
-                            <li class="nav-item ms-lg-2">
-                                <a class="btn btn-outline-primary" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Déconnexion</a>
+                            @canany(['gerer-ressources', 'gerer-referentiels', 'gerer-utilisateurs', 'gerer-roles', 'gerer-actualites', 'voir-statistiques'])
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Espace de gestion</a>
+                                </li>
+                            @endcanany
+                            <li class="nav-item dropdown ms-lg-2">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    {{ Auth::user()->prenom ?? Auth::user()->nom }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">
+                                            <i class="bi bi-person me-2"></i> Mon profil
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
+                                        </a>
+                                    </li>
+                                </ul>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                             </li>
                         @endguest
@@ -146,4 +164,4 @@
         </div>
     </footer>
 </body>
-</html> 
+</html>

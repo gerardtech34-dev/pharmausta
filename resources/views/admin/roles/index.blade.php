@@ -13,14 +13,19 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
     <div class="card border-0 shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Nom</th>
+                            <th>Nom du rôle</th>
                             <th>Permissions</th>
+                            <th>Utilisateurs assignés</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -29,17 +34,27 @@
                             <tr>
                                 <td class="fw-bold">{{ $role->name }}</td>
                                 <td>
-                                    @forelse($role->permissions as $permission)
-                                        <span class="badge bg-secondary me-1">{{ $permission->name }}</span>
-                                    @empty
-                                        <span class="text-muted">Aucune permission</span>
-                                    @endforelse
+                                    <span class="badge bg-primary">
+                                        {{ $role->permissions_count }} permission{{ $role->permissions_count > 1 ? 's' : '' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ $role->users_count }} utilisateur{{ $role->users_count > 1 ? 's' : '' }}
+                                    </span>
                                 </td>
                                 <td class="text-nowrap">
-                                    <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
+                                    <a href="{{ route('admin.roles.show', $role) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> Voir
                                     </a>
-                                    @if($role->name !== 'Administrateur principal')
+                                    @if($role->name === 'Administrateur')
+                                        <span class="badge bg-dark ms-1">
+                                            <i class="bi bi-lock"></i> Protégé
+                                        </span>
+                                    @else
+                                        <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
                                         <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
                                             @csrf
                                             @method('DELETE')
@@ -52,7 +67,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="text-center text-muted">Aucun rôle trouvé.</td>
+                                <td colspan="4" class="text-center text-muted">Aucun rôle trouvé.</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -41,6 +41,11 @@ class UserController extends Controller implements HasMiddleware
 
     public function toggleActive(User $user)
     {
+        if ($user->hasRole('Administrateur')) {
+            session()->flash('error', 'Ce compte ne peut pas être désactivé.');
+            return redirect()->route('admin.users.index');
+        }
+
         $user->actif = !$user->actif;
         $user->save();
         session()->flash('success', 'Statut du compte modifié avec succès.');
@@ -49,6 +54,11 @@ class UserController extends Controller implements HasMiddleware
 
     public function destroy(User $user)
     {
+        if ($user->hasRole('Administrateur')) {
+            session()->flash('error', 'Ce compte ne peut pas être supprimé.');
+            return redirect()->route('admin.users.index');
+        }
+
         $user->delete();
         session()->flash('success', 'Utilisateur supprimé avec succès.');
         return redirect()->route('admin.users.index');

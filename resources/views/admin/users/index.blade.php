@@ -8,6 +8,10 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.users.index') }}" class="row g-2">
@@ -59,20 +63,26 @@
                                     <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn btn-sm btn-outline-warning">
-                                            <i class="bi bi-toggle-on"></i>
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if($user->hasRole('Administrateur'))
+                                        <span class="badge bg-dark ms-1" title="Ce compte est protégé">
+                                            <i class="bi bi-shield-lock"></i> Protégé
+                                        </span>
+                                    @else
+                                        <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm btn-outline-warning">
+                                                <i class="bi bi-toggle-on"></i>
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

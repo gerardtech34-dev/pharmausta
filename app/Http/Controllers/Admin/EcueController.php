@@ -21,16 +21,17 @@ class EcueController extends Controller implements HasMiddleware
 
     public function index(Request $request)
     {
-        $ecues = Ecue::with('ue')->get();
+        $ecues = Ecue::with('ue')->orderBy('ue_id')->orderBy('nom')->get();
         if ($request->expectsJson()) {
             return response()->json($ecues);
         }
-        return view('admin.ecues.index', compact('ecues'));
+        $ues = Ue::orderBy('nom')->get();
+        return view('admin.ecues.index', compact('ecues', 'ues'));
     }
 
     public function create()
     {
-        $ues = Ue::all();
+        $ues = Ue::orderBy('nom')->get();
         return view('admin.ecues.create', compact('ues'));
     }
 
@@ -43,7 +44,7 @@ class EcueController extends Controller implements HasMiddleware
 
     public function edit(Ecue $ecue)
     {
-        $ues = Ue::all();
+        $ues = Ue::orderBy('nom')->get();
         return view('admin.ecues.edit', compact('ecue', 'ues'));
     }
 

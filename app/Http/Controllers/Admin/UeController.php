@@ -21,16 +21,17 @@ class UeController extends Controller implements HasMiddleware
 
     public function index(Request $request)
     {
-        $ues = Ue::with('niveau')->get();
+        $ues = Ue::with('niveau')->orderBy('niveau_id')->orderBy('nom')->get();
         if ($request->expectsJson()) {
             return response()->json($ues);
         }
-        return view('admin.ues.index', compact('ues'));
+        $niveaux = Niveau::orderBy('nom')->get();
+        return view('admin.ues.index', compact('ues', 'niveaux'));
     }
 
     public function create()
     {
-        $niveaux = Niveau::all();
+        $niveaux = Niveau::orderBy('nom')->get();
         return view('admin.ues.create', compact('niveaux'));
     }
 
@@ -43,7 +44,7 @@ class UeController extends Controller implements HasMiddleware
 
     public function edit(Ue $ue)
     {
-        $niveaux = Niveau::all();
+        $niveaux = Niveau::orderBy('nom')->get();
         return view('admin.ues.edit', compact('ue', 'niveaux'));
     }
 

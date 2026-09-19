@@ -12,7 +12,7 @@
     <div class="d-flex">
         <aside class="text-white d-flex flex-column flex-shrink-0 p-3" style="width: 250px; min-height: 100vh; background-color: #2E1A5C;">
             <a href="{{ url('/admin') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                <img src="{{ asset('images/logo.png') }}" alt="PharmaUSTA" height="40" class="me-2">
+                 <img src="{{ asset('images/logo.png') }}" alt="PharmaUSTA" height="40" class="me-2">
                 <span class="fs-5 fw-bold">PharmaUSTA</span>
             </a>
             <hr class="text-white-50">
@@ -90,7 +90,7 @@
         </aside>
 
         <div class="flex-grow-1">
-            <header class="bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center">
+            <header class="bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center header-sticky">
                 <h5 class="mb-0">@yield('page-title', 'Administration')</h5>
                 <div class="d-flex align-items-center">
                     <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm me-3">

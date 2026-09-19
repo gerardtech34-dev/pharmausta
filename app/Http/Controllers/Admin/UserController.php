@@ -36,7 +36,8 @@ class UserController extends Controller implements HasMiddleware
     public function show(User $user)
     {
         $user->load('roles');
-        return view('admin.users.show', compact('user'));
+        $roles = Role::where('name', '!=', 'Administrateur')->get();
+        return view('admin.users.show', compact('user', 'roles'));
     }
 
     public function toggleActive(User $user)
@@ -72,9 +73,38 @@ class UserController extends Controller implements HasMiddleware
         ]);
 
         $roleNames = Role::whereIn('id', $request->input('role_ids'))->pluck('name')->toArray();
+
+        $administrateurSoumis = in_array('Administrateur', $roleNames, true);
+
+        if ($administrateurSoumis) {
+            $roleNames = array_values(array_filter($roleNames, fn ($name) => $name !== 'Administrateur'));
+
+            if (!$user->hasRole('Administrateur')) {
+                $user->syncRoles($roleNames);
+                session()->flash('error', 'Le rôle Administrateur ne peut pas être assigné manuellement.');
+                return redirect()->route('admin.users.show', $user);
+            }
+
+            $user->syncRoles($roleNames);
+            session()->flash('error', 'Le rôle Administrateur ne peut pas être assigné manuellement.');
+            return redirect()->route('admin.users.show', $user);
+        }
+
         $user->syncRoles($roleNames);
 
         session()->flash('success', 'Rôles assignés avec succès.');
+        return redirect()->route('admin.users.show', $user);
+    }
+
+    public function removeRole(User $user, Role $role)
+    {
+        if ($role->name === 'Administrateur') {
+            session()->flash('error', 'Ce rôle est protégé et ne peut pas être retiré.');
+            return redirect()->route('admin.users.show', $user);
+        }
+
+        $user->removeRole($role);
+        session()->flash('success', 'Rôle retiré avec succès.');
         return redirect()->route('admin.users.show', $user);
     }
 }

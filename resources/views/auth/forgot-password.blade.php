@@ -23,7 +23,7 @@
                         <button type="submit" class="btn btn-primary">Envoyer le lien de réinitialisation</button>
                     </form>
                     <div class="mt-3">
-                        <a href="{{ route('login') }}">Retour à la connexion</a>
+                        <a href="{{ route('login') }}" style="color: #6B3FD4;">Retour à la connexion</a>
                     </div>
                 </div>
             </div>

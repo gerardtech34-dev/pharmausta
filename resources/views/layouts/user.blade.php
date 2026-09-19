@@ -9,10 +9,10 @@
     @vite(['resources/js/app.js'])
 </head>
 <body class="bg-light">
-    <header class="bg-white shadow-sm">
+    <header class="bg-white shadow-sm header-sticky">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="{{ url('/') }}">
+                <a class="navbar-brand fw-bold brand-text d-flex align-items-center" href="{{ url('/') }}">
                     <img src="{{ asset('images/logo.png') }}" alt="PharmaUSTA" height="40" class="me-2">
                     PharmaUSTA
                 </a>
@@ -39,7 +39,9 @@
                             <a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">Mon profil</a>
                         </li>
                         <li class="nav-item ms-lg-2">
-                            <a class="btn btn-outline-primary" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Déconnexion</a>
+                            <a class="btn btn-outline-danger btn-sm" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
+                            </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                         </li>
                     </ul>

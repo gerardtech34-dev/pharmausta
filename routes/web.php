@@ -17,14 +17,13 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ActualiteRechercheController;
 use App\Http\Controllers\ArborescenceController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RessourceRechercheController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ContactController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/contact', 'contact')->name('contact');
-Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 
 Route::middleware('guest')->group(function () {
@@ -74,6 +73,7 @@ Route::middleware(['auth', 'permission:gerer-utilisateurs'])->prefix('admin')->n
     Route::patch('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::post('/users/{user}/roles', [UserController::class, 'assignRole'])->name('users.assign-role');
+    Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole'])->name('users.removeRole');
 });
 
 Route::middleware(['auth', 'permission:gerer-roles'])->prefix('admin')->name('admin.')->group(function () {

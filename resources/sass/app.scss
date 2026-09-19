@@ -1,6 +1,7 @@
 // Variables Bootstrap
-$primary: #4B2E83;
+$primary: #A982F6;
 $success: #5FA82C;
+$primary-dark: #6B3FD4;
 $border-radius: .5rem;
 $font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
@@ -9,13 +10,13 @@ $font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetic
 
 // Classes utilitaires custom
 .hero-gradient {
-    background: linear-gradient(135deg, rgba(75, 46, 131, 0.65), rgba(46, 26, 92, 0.75)), url('/images/hero-bg.jpg');
+    background: linear-gradient(135deg, rgba(169,130,246,0.60), rgba(107,63,212,0.78)), url('/images/hero.jpg');
     background-size: cover;
     background-position: center;
 }
 
 .stats-gradient {
-    background: linear-gradient(to right, #4B2E83 0%, #7A2E4D 100%);
+    background: linear-gradient(to right, #A982F6 0%, #7A2E4D 100%);
 }
 
 .card-soft {
@@ -29,12 +30,24 @@ $font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetic
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--bs-primary, #4B2E83);
+    background-color: var(--bs-primary, #A982F6);
     color: white;
     font-size: 1.5rem;
 }
 
 .nav-link.active {
-    border-bottom: 2px solid #4B2E83;
+    border-bottom: 2px solid $primary-dark;
+    color: $primary-dark;
     font-weight: 600;
+}
+
+.brand-text {
+    color: $primary-dark;
+}
+
+.header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background-color: #fff;
 }

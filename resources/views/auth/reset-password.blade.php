@@ -43,6 +43,10 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">Réinitialiser le mot de passe</button>
+
+                        <div class="mt-3">
+                            <a href="{{ route('login') }}" style="color: #6B3FD4;">Retour à la connexion</a>
+                        </div>
                     </form>
                 </div>
             </div>

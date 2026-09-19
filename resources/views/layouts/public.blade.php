@@ -10,10 +10,10 @@
     @vite(['resources/js/app.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <header class="bg-white shadow-sm">
+    <header class="bg-white shadow-sm header-sticky">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="{{ url('/') }}">
+                <a class="navbar-brand fw-bold brand-text d-flex align-items-center" href="{{ url('/') }}">
                     <img src="{{ asset('images/logo.png') }}" alt="PharmaUSTA" height="40" class="me-2">
                     PharmaUSTA
                 </a>
